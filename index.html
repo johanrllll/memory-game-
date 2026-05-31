@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Espace Scolaire - Zone Afrique de l'Ouest</title>
+    <style>
+        /* Styles de Base Global */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 200px 20px 40px 20px; /* Espace pour ne pas cacher le contenu sous le menu fixe */
+            transition: all 0.5s ease-in-out;
+            min-height: 100vh;
+            background-color: #f4f6f9;
+        }
+
+        /* Menu de sélection fixe en haut */
+        .header-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .header-nav label {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-right: 10px;
+            color: #333;
+        }
+
+        .header-nav select {
+            padding: 10px 20px;
+            font-size: 1em;
+            border-radius: 25px;
+            border: 2px solid #007bff;
+            outline: none;
+            cursor: pointer;
+            background: white;
+            font-weight: bold;
+        }
+
+        /* Grille des Matières */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .title-classe {
+            text-align: center;
+            font-size: 2.2em;
+            margin-bottom: 30px;
+            color: #222;
+            text-shadow: 1px 1px 3px rgba(255,255,255,0.8);
+        }
+
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .subject-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .subject-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+        }
+
+        .subject-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .subject-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* --------------------------------------------------- */
+        /* AMBIANCES DES DESIGNS (Gérées par le JavaScript) */
+        /* --------------------------------------------------- */
+
+        /* Collège (6e à 3e) : Ambiance Cahier, Livres et initiation Chimie */
+        body.theme-college {
+            background-color: #fdf6e2;
+            /* Motif de fond simulant des lignes de cahier et de la texture */
+            background-image: linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px), 
+                              radial-gradient(rgba(0,123,255,0.05) 15%, transparent 16%);
+            background-size: 100% 24px, 40px 40px;
+        }
+        body.theme-college .subject-card {
+            border-left: 5px solid #ff9f43;
+        }
+
+        /* Lycée Seconde / Première : Scientifique poussé */
+        body.theme-lycee-sciences {
+            background-color: #0f172a; /* Bleu nuit/Espace techno */
+            color: #f8fafc;
+            background-image: radial-gradient(rgba(56, 189, 248, 0.15) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+        body.theme-lycee-sciences .title-classe { color: #38bdf8; }
+        body.theme-lycee-sciences .subject-card {
+            background: rgba(30, 41, 59, 0.85);
+            color: white;
+            border: 1px solid #38bdf8;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+        }
+        body.theme-lycee-sciences .subject-name { color: #f1f5f9; }
+
+        /* Lycée Terminale : Littérature, Philosophie, style Papier Ancien / Bibliothèque */
+        body.theme-terminale-litt {
+            background-color: #f4eae1;
+            background-image: radial-gradient(#d2b48c 0.5px, transparent 0.5px), radial-gradient(#d2b48c 0.5px, #f4eae1 0.5px);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+        }
+        body.theme-terminale-litt .title-classe { font-family: 'Georgia', serif; color: #4a3b32; }
+        body.theme-terminale-litt .subject-card {
+            background: #fffcf7;
+            border: 1px solid #d7ccc8;
+            border-radius: 4px; /* Style vieux livre */
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.05);
+        }
+        body.theme-terminale-litt .subject-name { font-family: 'Georgia', serif; color: #4a3b32; }
+    </style>
+</head>
+<body>
+
+    <div class="header-nav">
+        <label for="classe-select">Choisir votre classe :</label>
+        <select id="classe-select" onchange="changerClasse()">
+            <option value="6e">Sixième (6ème)</option>
+            <option value="5e">Cinquième (5ème)</option>
+            <option value="4e">Quatrième (4ème)</option>
+            <option value="3e">Troisième (3ème)</option>
+            <option value="2nde">Seconde</option>
+            <option value="1ere">Première</option>
+            <option value="Tle">Terminale</option>
+        </select>
+    </div>
+
+    <div class="container">
+        <h1 id="nom-classe" class="title-classe">Classe de Sixième</h1>
+        <div id="liste-matieres" class="subjects-grid">
+            </div>
+    </div>
+
+    <script>
+        // Configuration de la liste complète des matières d'Afrique de l'Ouest
+        const matieresAfriqueOuest = [
+            { name: "Mathématiques", icon: "📐" },
+            { name: "Physique - Chimie", icon: "🧪" },
+            { name: "SVT (Sciences de la Vie et de la Terre)", icon: "🌱" },
+            { name: "Français & Littérature", icon: "📚" },
+            { name: "Histoire - Géographie", icon: "🌍" },
+            { name: "Anglais", icon: "🇬🇧" },
+            { name: "Espagnol / Allemand", icon: "🇪🇸" },
+            { name: "Philosophie", icon: "🧠" },
+            { name: "EDHC (Éduc. aux Droits de l'Homme)", icon: "⚖️" },
+            { name: "Arts Plastiques / Musique", icon: "🎨" },
+            { name: "Informatique / TIC", icon: "💻" },
+            { name: "EPS (Sport)", icon: "🏃‍♂️" }
+        ];
+
+        function changerClasse() {
+            const select = document.getElementById("classe-select");
+            const classeSelectionnee = select.value;
+            const titre = document.getElementById("nom-classe");
+            const grid = document.getElementById("liste-matieres");
+            const body = document.body;
+
+            // Mettre à jour le titre
+            titre.textContent = "Classe de " + select.options[select.selectedIndex].text;
+
+            // Nettoyer les classes de thèmes sur le body
+            body.className = "";
+
+            // Appliquer le thème visuel selon le niveau choisi
+            if (["6e", "5e", "4e", "3e"].includes(classeSelectionnee)) {
+                body.classList.add("theme-college");
+            } else if (["2nde", "1ere"].includes(classeSelectionnee)) {
+                body.classList.add("theme-lycee-sciences");
+            } else if (classeSelectionnee === "Tle") {
+                body.classList.add("theme-terminale-litt");
+            }
+
+            // Générer dynamiquement les 12 matières dans la grille
+            grid.innerHTML = ""; 
+            matieresAfriqueOuest.forEach(matiere => {
+                // Gestion des cas particuliers selon la classe (ex: pas de Philo au collège)
+                if (matiere.name === "Philosophie" && ["6e", "5e", "4e", "3e"].includes(classeSelectionnee)) {
+                    return; // On passe, pas de philo en dessous de la terminale/première
+                }
+                if (matiere.name === "Physique - Chimie" && classeSelectionnee === "6e") {
+                    return; // En 6ème, c'est généralement inclus dans les sciences générales ou absent
+                }
+
+                // Création de la carte HTML pour la matière
+                const card = document.createElement("div");
+                card.className = "subject-card";
+                card.onclick = function() {
+                    alert("Ouverture de la matière : " + matiere.name + " (" + classeSelectionnee + ")");
+                };
+
+                card.innerHTML = `
+                    <span class="subject-icon">${matiere.icon}</span>
+                    <span class="subject-name">${matiere.name}</span>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Lancer la fonction une première fois au chargement pour afficher la 6ème
+        window.onload = changerClasse;
+    </script>
+</body>
+</html>
